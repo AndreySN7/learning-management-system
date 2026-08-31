@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-teacher.sql
+  - include:
+      file: db/changelog/changes/002-create-student.sql
+  - include:
+      file: db/changelog/changes/003-create-groups.sql
+  - include:
+      file: db/changelog/changes/004-create-course.sql
+  - include:
+      file: db/changelog/changes/005-create-students_groups.sql
+  - include:
+      file: db/changelog/changes/006-create-schedule.sql
+  - include:
+      file: db/changelog/changes/007-create-schedule__change1.sql

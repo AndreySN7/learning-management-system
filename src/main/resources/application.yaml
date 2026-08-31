@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: learning-management-system
+  config:
+    import: optional:db-credentials.yml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/learning-management-system
+    username: ${DB_USERNAME:username}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
