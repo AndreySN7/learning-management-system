@@ -22,7 +22,7 @@ public class TeacherServiceImpl implements TeacherService {
 		Teacher teacher = teacherRepository.findById(id)
 					.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
 
-		log.info("Teacher has been found");
+		log.info("Teacher with id = {} has been found: ", id, teacher);
 		return teacherMapper.toDto(teacher);
 	}
 
