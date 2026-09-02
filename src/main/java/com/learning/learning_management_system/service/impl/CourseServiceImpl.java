@@ -8,7 +8,9 @@ import com.learning.learning_management_system.repository.CourseRepository;
 import com.learning.learning_management_system.service.CourseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -19,8 +21,7 @@ public class CourseServiceImpl implements CourseService {
 
 	@Override
 	public CourseDto getCourse(Long id) {
-		Course course = courseRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+		Course course = validCourse(id);
 
 		log.info("Course with id = {} has been found: {} ", id, course);
 		return courseMapper.toDto(course);
@@ -34,9 +35,9 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
+	@Transactional
 	public void updateCourse(Long id, CourseDto courseDto) {
-		courseRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+		validCourse(id);
 
 		Course course = new Course(id, courseDto.name(), courseDto.description());
 		courseRepository.save(course);
@@ -44,10 +45,15 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteCourse(Long id) {
-		Course course = courseRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Course not found"));
+		Course course = validCourse(id);
 		courseRepository.delete(course);
 		log.info("Course has been deleted");
+	}
+
+	private @NonNull Course validCourse(Long id) {
+		return courseRepository.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException("Course not found"));
 	}
 }

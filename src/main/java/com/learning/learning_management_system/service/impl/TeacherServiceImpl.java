@@ -8,7 +8,9 @@ import com.learning.learning_management_system.repository.TeacherRepository;
 import com.learning.learning_management_system.service.TeacherService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -19,10 +21,9 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Override
 	public TeacherDto getTeacher(Long id) {
-		Teacher teacher = teacherRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+		Teacher teacher = validTeacher(id);
 
-		log.info("Teacher with id = {} has been found: ", id, teacher);
+		log.info("Teacher with id = {} has been found: {}", id, teacher);
 		return teacherMapper.toDto(teacher);
 	}
 
@@ -34,8 +35,9 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
+	@Transactional
 	public void updateTeacher(Long id, TeacherDto teacherDto) {
-		teacherRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+		validTeacher(id);
 
 		Teacher currentTeacher = new Teacher(id, teacherDto.name(), teacherDto.surname());
 		teacherRepository.save(currentTeacher);
@@ -43,12 +45,17 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteTeacher(Long id) {
-		Teacher teacher = teacherRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+		Teacher teacher = validTeacher(id);
 
 		teacherRepository.delete(teacher);
 		log.info("Teacher has been deleted");
 	}
 
+
+	private @NonNull Teacher validTeacher(Long id) {
+		return teacherRepository.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+	}
 }

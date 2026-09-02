@@ -17,3 +17,9 @@ databaseChangeLog:
       file: db/changelog/changes/008-insert-teachers.sql
   - include:
       file: db/changelog/changes/009-insert-course.sql
+  - include:
+      file: db/changelog/changes/010-insert-students.sql
+  - include:
+      file: db/changelog/changes/011-insert-groups.sql
+  - include:
+      file: db/changelog/changes/012-insert-students-groups.sql
