@@ -36,7 +36,7 @@ public class StudentServiceImpl implements StudentService {
 		StudentDto studentDto = studentMapper.toDto(student);
 		studentDto.groups().addAll(studentGroups);
 
-		log.info("Student with id = {} has been found: {}", id, student);
+		log.info("Student with id = {} has been found", id);
 		return studentDto;
 	}
 

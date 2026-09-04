@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
-@RequestMapping(path = "api/v1/course")
+@RequestMapping(path = "/api/v1/course")
 @AllArgsConstructor
 public class CourseController {
 	private final CourseService courseService;
