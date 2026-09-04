@@ -1,0 +1,7 @@
+package com.learning.learning_management_system.repository;
+
+import com.learning.learning_management_system.entity.Course;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CourseRepository extends JpaRepository<Course, Long> {
+}
