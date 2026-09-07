@@ -2,13 +2,12 @@ package com.learning.learning_management_system.service.impl;
 
 import com.learning.learning_management_system.dto.CourseDto;
 import com.learning.learning_management_system.entity.Course;
-import com.learning.learning_management_system.exception.EntityNotFoundException;
 import com.learning.learning_management_system.mapper.CourseMapper;
 import com.learning.learning_management_system.repository.CourseRepository;
 import com.learning.learning_management_system.service.CourseService;
+import com.learning.learning_management_system.validation.EntityValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseServiceImpl implements CourseService {
 	private final CourseRepository courseRepository;
 	private final CourseMapper courseMapper;
+	private final EntityValidator entityValidator;
 
 	@Override
 	public CourseDto getCourse(Long id) {
-		Course course = validCourse(id);
+		Course course = entityValidator.validateCourseExist(id);
 
 		log.info("Course with id = {} has been found: {} ", id, course);
 		return courseMapper.toDto(course);
@@ -37,7 +37,7 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	@Transactional
 	public void updateCourse(Long id, CourseDto courseDto) {
-		validCourse(id);
+		entityValidator.validateCourseExist(id);
 
 		Course course = new Course(id, courseDto.name(), courseDto.description());
 		courseRepository.save(course);
@@ -47,13 +47,8 @@ public class CourseServiceImpl implements CourseService {
 	@Override
 	@Transactional
 	public void deleteCourse(Long id) {
-		Course course = validCourse(id);
+		Course course = entityValidator.validateCourseExist(id);
 		courseRepository.delete(course);
 		log.info("Course has been deleted");
-	}
-
-	private @NonNull Course validCourse(Long id) {
-		return courseRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Course not found"));
 	}
 }

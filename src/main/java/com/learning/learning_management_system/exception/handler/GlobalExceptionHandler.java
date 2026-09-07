@@ -4,6 +4,7 @@ import com.learning.learning_management_system.exception.DataValidateException;
 import com.learning.learning_management_system.exception.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,8 +31,18 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
 
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleTypeMismatchException(HttpMessageNotReadableException ex) {
+		String message = "Неверный формат поля";
+		if (ex.getMessage().contains("LocalDate")) {
+			message = "Дата должна быть в формате yyyy-MM-dd";
+		}
+		ErrorResponse errorResponse = new ErrorResponse(message);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleInternalServerError (Exception ex) {
+	public ResponseEntity<ErrorResponse> handleInternalServerError(Exception ex) {
 		String message = "Внутренняя ошибка сервера";
 		ErrorResponse errorResponse = new ErrorResponse(message);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);

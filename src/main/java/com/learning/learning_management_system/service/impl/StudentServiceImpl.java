@@ -3,11 +3,10 @@ package com.learning.learning_management_system.service.impl;
 import com.learning.learning_management_system.dto.StudentDto;
 import com.learning.learning_management_system.entity.Group;
 import com.learning.learning_management_system.entity.Student;
-import com.learning.learning_management_system.exception.EntityNotFoundException;
 import com.learning.learning_management_system.mapper.StudentMapper;
-import com.learning.learning_management_system.repository.GroupRepository;
 import com.learning.learning_management_system.repository.StudentRepository;
 import com.learning.learning_management_system.service.StudentService;
+import com.learning.learning_management_system.validation.EntityValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +20,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class StudentServiceImpl implements StudentService {
-	private final StudentRepository studentRepository;
 	private final StudentMapper studentMapper;
-	private final GroupRepository groupRepository;
+	private final StudentRepository studentRepository;
+	private final EntityValidator entityValidator;
 
 	@Override
 	public StudentDto getStudent(Long id) {
-		Student student = validStudent(id);
+		Student student = entityValidator.validateStudentExist(id);
 
 		Set<String> studentGroups = student.getGroups().stream()
 					.map(Group::getGroupName)
@@ -55,7 +54,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	@Transactional
 	public void updateStudent(Long id, StudentDto studentDto) {
-		validStudent(id);
+		entityValidator.validateStudentExist(id);
 
 		Set<Group> studentGroups = convertNamesToGroups(studentDto);
 		Student student = studentMapper.toEntity(studentDto);
@@ -68,21 +67,15 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public void deleteStudent(Long id) {
-		Student student = validStudent(id);
+		Student student = entityValidator.validateStudentExist(id);
 
 		studentRepository.delete(student);
 		log.info("Student has been deleted");
 	}
 
-	private @NonNull Student validStudent(Long id) {
-		return studentRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Student not found"));
-	}
-
 	private @NonNull Set<Group> convertNamesToGroups(StudentDto studentDto) {
 		return studentDto.groups().stream()
-					.map(name -> groupRepository.findByGroupName(name)
-								.orElseThrow(() -> new EntityNotFoundException("Group not found")))
+					.map(entityValidator::validateGroupNameExist)
 					.collect(Collectors.toSet());
 	}
 }

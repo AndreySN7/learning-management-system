@@ -29,7 +29,7 @@ public class GroupController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> addGroup(@RequestBody GroupDtoGroupName groupDtoGroupName) {
+	public ResponseEntity<Void> addGroup(@Valid @RequestBody GroupDtoGroupName groupDtoGroupName) {
 		groupService.addGroup(groupDtoGroupName);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}

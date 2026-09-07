@@ -2,13 +2,12 @@ package com.learning.learning_management_system.service.impl;
 
 import com.learning.learning_management_system.dto.TeacherDto;
 import com.learning.learning_management_system.entity.Teacher;
-import com.learning.learning_management_system.exception.EntityNotFoundException;
 import com.learning.learning_management_system.mapper.TeacherMapper;
 import com.learning.learning_management_system.repository.TeacherRepository;
 import com.learning.learning_management_system.service.TeacherService;
+import com.learning.learning_management_system.validation.EntityValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeacherServiceImpl implements TeacherService {
 	private final TeacherRepository teacherRepository;
 	private final TeacherMapper teacherMapper;
+	private final EntityValidator entityValidator;
 
 	@Override
 	public TeacherDto getTeacher(Long id) {
-		Teacher teacher = validTeacher(id);
+		Teacher teacher = entityValidator.validateTeacherExist(id);
 
 		log.info("Teacher with id = {} has been found: {}", id, teacher);
 		return teacherMapper.toDto(teacher);
@@ -37,7 +37,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public void updateTeacher(Long id, TeacherDto teacherDto) {
-		validTeacher(id);
+		entityValidator.validateTeacherExist(id);
 
 		Teacher currentTeacher = new Teacher(id, teacherDto.name(), teacherDto.surname());
 		teacherRepository.save(currentTeacher);
@@ -47,15 +47,9 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	@Transactional
 	public void deleteTeacher(Long id) {
-		Teacher teacher = validTeacher(id);
+		Teacher teacher = entityValidator.validateTeacherExist(id);
 
 		teacherRepository.delete(teacher);
 		log.info("Teacher has been deleted");
-	}
-
-
-	private @NonNull Teacher validTeacher(Long id) {
-		return teacherRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
 	}
 }
