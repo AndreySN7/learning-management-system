@@ -21,3 +21,7 @@ spring:
 logging:
   level:
     org.springframework.web: debug
+
+app:
+  cleanup:
+    cron: "0 */2 * * * *"

@@ -11,15 +11,20 @@ import com.learning.learning_management_system.service.CourseScheduleService;
 import com.learning.learning_management_system.validation.EntityValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CourseScheduleServiceImpl implements CourseScheduleService {
 	private final CourseScheduleRepository courseScheduleRepository;
 	private final EntityValidator entityValidator;
@@ -45,6 +50,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 					.collect(Collectors.toSet());
 
 		courseScheduleRepository.saveAll(courseSchedule);
+		log.info("Course schedule has been added");
 	}
 
 	@Override
@@ -56,7 +62,9 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 		}
 		courseSchedule.setStartDate(dto.startDate());
 		courseSchedule.setEndDate(dto.endDate());
+
 		courseScheduleRepository.save(courseSchedule);
+		log.info("Course schedule has been updated");
 	}
 
 	@Override
@@ -65,6 +73,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 		entityValidator.validateGroupExist(groupId);
 		Page<Schedule> courseSchedulePageByGroup = courseScheduleRepository.findAllByGroupId(groupId, pageable);
 		entityValidator.validateScheduleExist(courseSchedulePageByGroup);
+
+		log.info("Course schedule by group has been found");
 		return courseSchedulePageByGroup.map(courseScheduleMapper::toDto);
 	}
 
@@ -74,6 +84,23 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 		entityValidator.validateTeacherExist(teacherId);
 		Page<Schedule> courseSchedulePageByTeacher = courseScheduleRepository.findAllByTeacherId(teacherId, pageable);
 		entityValidator.validateScheduleExist(courseSchedulePageByTeacher);
+
+		log.info("Course schedule by teacher has been found");
 		return courseSchedulePageByTeacher.map(courseScheduleMapper::toDto);
+	}
+
+	@Override
+	@Scheduled(cron = "${app.cleanup.cron}")
+	@Transactional
+	public void removeCourseSchedule() {
+		LocalDate verificationDate = LocalDate.now().minusYears(1);
+		List<Schedule> allByEndDateBefore = courseScheduleRepository.findAllByEndDateBefore(verificationDate);
+
+		if (allByEndDateBefore.isEmpty()) {
+			log.info("Course schedule not found to delete");
+		} else {
+			courseScheduleRepository.deleteAll(allByEndDateBefore);
+			log.info("Course schedule has been removed ({} records)", allByEndDateBefore.size());
+		}
 	}
 }
