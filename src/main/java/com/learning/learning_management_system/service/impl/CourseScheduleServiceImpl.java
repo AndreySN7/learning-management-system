@@ -3,6 +3,7 @@ package com.learning.learning_management_system.service.impl;
 import com.learning.learning_management_system.dto.CourseSchedule.CourseScheduleDtoCourseTime;
 import com.learning.learning_management_system.dto.CourseSchedule.CourseScheduleDtoGroupToCourse;
 import com.learning.learning_management_system.dto.CourseSchedule.CourseScheduleDtoResponse;
+import com.learning.learning_management_system.entity.Course;
 import com.learning.learning_management_system.entity.Schedule;
 import com.learning.learning_management_system.exception.DataValidateException;
 import com.learning.learning_management_system.mapper.CourseScheduleMapper;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,16 +41,15 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 			teacherRepository.findByIdOrThrow(dto.teacherId());
 		}
 
-		Set<Schedule> courseSchedule = dto.coursesIds().stream()
-					.map(id -> {
-						courseRepository.findByIdOrThrow(id);
-						return Schedule.builder()
-									.groupId(groupId)
-									.teacherId(dto.teacherId())
-									.courseId(id)
-									.build();
-					})
-					.collect(Collectors.toSet());
+		List<Course> courses = courseRepository.findAllById(dto.coursesIds());
+		Set<Schedule> courseSchedule = courses.stream()
+					.map(course ->
+								Schedule.builder()
+											.groupId(groupId)
+											.teacherId(dto.teacherId())
+											.courseId(course.getId())
+											.build())
+								.collect(Collectors.toSet());
 
 		courseScheduleRepository.saveAll(courseSchedule);
 		log.info("Course schedule has been added");
