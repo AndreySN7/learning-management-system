@@ -14,7 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -22,10 +22,10 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Entity
 @Table(name = "schedule")
 @Builder
+@SQLRestriction(value = "deleted = false")
 public class Schedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,9 @@ public class Schedule {
 
 	@Column(name = "class_end_date")
 	private LocalDate endDate;
+
+	@Column(columnDefinition = "boolean default false")
+	private boolean deleted;
 
 
 	@ManyToOne(fetch = FetchType.LAZY)

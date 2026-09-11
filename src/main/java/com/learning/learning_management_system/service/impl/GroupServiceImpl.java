@@ -8,12 +8,12 @@ import com.learning.learning_management_system.entity.Student;
 import com.learning.learning_management_system.exception.DataValidateException;
 import com.learning.learning_management_system.mapper.GroupMapper;
 import com.learning.learning_management_system.repository.GroupRepository;
+import com.learning.learning_management_system.repository.StudentRepository;
 import com.learning.learning_management_system.service.GroupService;
-import com.learning.learning_management_system.validation.EntityValidator;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,70 +24,70 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService {
 	private final GroupRepository groupRepository;
 	private final GroupMapper groupMapper;
-	private final EntityValidator entityValidator;
+	private final StudentRepository studentRepository;
 
 	@Override
+	@Transactional(readOnly = true)
 	public GroupDtoResponse getGroup(Long id) {
-		Group group = entityValidator.validateGroupExist(id);
-
-		Set<String> students = group.getStudents().stream()
-					.map(student -> student.getName() + " " + student.getSurname())
-					.collect(Collectors.toSet());
-
-		GroupDtoResponse dtoResponse = groupMapper.toDto(group);
-		dtoResponse.students().addAll(students);
-
+		Group group = groupRepository.findByIdOrThrow(id);
 		log.info("Group with id = {} has been found", id);
-		return dtoResponse;
+		return groupMapper.toFullDto(group);
 	}
 
 	@Override
 	@Transactional
-	public void addGroup(GroupDtoGroupName groupDtoGroupName) {
+	public GroupDtoResponse addGroup(GroupDtoGroupName groupDtoGroupName) {
 		Group group = groupMapper.toEntityWithGroupName(groupDtoGroupName);
-		entityValidator.validateGroupNameExist(groupDtoGroupName.groupName());
-
+		if (groupRepository.findByGroupName(groupDtoGroupName.groupName()).isPresent()) {
+			throw new DataValidateException("Group with name " + groupDtoGroupName.groupName() + " already exists");
+		}
 		groupRepository.save(group);
 		log.info("Group has been added");
+
+		return groupMapper.toDto(group);
 	}
 
 	@Override
 	@Transactional
-	public void updateGroup(Long id, GroupDtoGroupName groupDtoGroupName) {
-		Group group = entityValidator.validateGroupExist(id);
-		entityValidator.validateGroupNameExist(groupDtoGroupName.groupName());
+	public GroupDtoResponse updateGroup(Long id, GroupDtoGroupName groupDtoGroupName) {
+		Group group = groupRepository.findByIdOrThrow(id);
 
+		if (groupRepository.findByGroupName(groupDtoGroupName.groupName()).isPresent()) {
+			throw new DataValidateException("Group with name " + groupDtoGroupName.groupName() + " already exists");
+		}
 
 		group.setGroupName(groupDtoGroupName.groupName());
-		groupRepository.save(group);
 		log.info("Group has been updated");
+
+		return groupMapper.toFullDto(group);
 	}
 
 	@Override
 	@Transactional
-	public void deleteGroup(Long id) {
-		Group group = entityValidator.validateGroupExist(id);
+	public GroupDtoResponse deleteGroup(Long id) {
+		Group group = groupRepository.findByIdOrThrow(id);
 
 		Set<Student> students = group.getStudents();
 		if (!students.isEmpty()) {
 			throw new DataValidateException("Deletion is not possible. You must disband the group first");
 		}
-
-		groupRepository.delete(group);
+		group.setDeleted(true);
 		log.info("Group has been deleted");
+		return groupMapper.toFullDto(group);
 	}
 
 	@Override
 	@Transactional
-	public void addStudentToGroup(Long groupId, GroupDtoSetStudents studentsDto) {
-		entityValidator.validateGroupExist(groupId);
+	public GroupDtoResponse addStudentToGroup(Long groupId, GroupDtoSetStudents studentsDto) {
+		Group group = groupRepository.findByIdOrThrow(groupId);
 
 		Set<Student> newStudents = studentsDto.studentsIds().stream()
-					.map(entityValidator::validateStudentExist)
+					.map(studentRepository::findByIdOrThrow)
 					.collect(Collectors.toSet());
 
 		newStudents.forEach(student -> groupRepository.addStudentToGroup(groupId, student.getId()));
 
 		log.info("Student has been added to group with id = {}", groupId);
+		return groupMapper.toFullDto(group);
 	}
 }

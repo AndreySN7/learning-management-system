@@ -14,6 +14,4 @@ public interface CourseScheduleService {
 	Page<CourseScheduleDtoResponse> getScheduleForCourseByGroup(Long groupId, Pageable pageable);
 
 	Page<CourseScheduleDtoResponse> getScheduleClassesByTeacher(Long teacherId, Pageable pageable);
-
-	void removeCourseSchedule();
 }

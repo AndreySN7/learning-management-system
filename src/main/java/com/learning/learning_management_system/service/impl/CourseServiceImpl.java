@@ -1,11 +1,11 @@
 package com.learning.learning_management_system.service.impl;
 
-import com.learning.learning_management_system.dto.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDtoResponse;
 import com.learning.learning_management_system.entity.Course;
 import com.learning.learning_management_system.mapper.CourseMapper;
 import com.learning.learning_management_system.repository.CourseRepository;
 import com.learning.learning_management_system.service.CourseService;
-import com.learning.learning_management_system.validation.EntityValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,38 +17,39 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseServiceImpl implements CourseService {
 	private final CourseRepository courseRepository;
 	private final CourseMapper courseMapper;
-	private final EntityValidator entityValidator;
 
 	@Override
-	public CourseDto getCourse(Long id) {
-		Course course = entityValidator.validateCourseExist(id);
+	public CourseDtoResponse getCourse(Long id) {
+		Course course = courseRepository.findByIdOrThrow(id);
 
 		log.info("Course with id = {} has been found: {} ", id, course);
 		return courseMapper.toDto(course);
 	}
 
 	@Override
-	public void addCourse(CourseDto courseDto) {
+	public CourseDtoResponse addCourse(CourseDto courseDto) {
 		Course course = courseMapper.toEntity(courseDto);
 		courseRepository.save(course);
 		log.info("Course has been added");
+		return courseMapper.toDto(course);
 	}
 
 	@Override
 	@Transactional
-	public void updateCourse(Long id, CourseDto courseDto) {
-		entityValidator.validateCourseExist(id);
-
-		Course course = new Course(id, courseDto.name(), courseDto.description());
-		courseRepository.save(course);
+	public CourseDtoResponse updateCourse(Long id, CourseDto courseDto) {
+		Course course = courseRepository.findByIdOrThrow(id);
+		course.setName(courseDto.name());
+		course.setDescription(courseDto.description());
 		log.info("Course has been updated");
+		return courseMapper.toDto(course);
 	}
 
 	@Override
 	@Transactional
-	public void deleteCourse(Long id) {
-		Course course = entityValidator.validateCourseExist(id);
-		courseRepository.delete(course);
+	public CourseDtoResponse deleteCourse(Long id) {
+		Course course = courseRepository.findByIdOrThrow(id);
+		course.setDeleted(true);
 		log.info("Course has been deleted");
+		return courseMapper.toDto(course);
 	}
 }

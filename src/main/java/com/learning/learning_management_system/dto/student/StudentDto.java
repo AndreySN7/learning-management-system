@@ -1,4 +1,4 @@
-package com.learning.learning_management_system.dto;
+package com.learning.learning_management_system.dto.student;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,9 +13,9 @@ public record StudentDto(
 			@NotEmpty(message = "Group set cannot be empty")
 			Set<String> groups
 ) {
-	public StudentDto{
+	public StudentDto {
 		if (groups == null) {
-			groups = new HashSet<String>();
+			groups = new HashSet<>();
 		}
 	}
 }

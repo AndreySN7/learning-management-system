@@ -1,17 +1,18 @@
 package com.learning.learning_management_system.service.impl;
 
-import com.learning.learning_management_system.dto.StudentDto;
+import com.learning.learning_management_system.dto.student.StudentDto;
+import com.learning.learning_management_system.dto.student.StudentDtoResponse;
 import com.learning.learning_management_system.entity.Group;
 import com.learning.learning_management_system.entity.Student;
 import com.learning.learning_management_system.mapper.StudentMapper;
+import com.learning.learning_management_system.repository.GroupRepository;
 import com.learning.learning_management_system.repository.StudentRepository;
 import com.learning.learning_management_system.service.StudentService;
-import com.learning.learning_management_system.validation.EntityValidator;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,60 +23,55 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
 	private final StudentMapper studentMapper;
 	private final StudentRepository studentRepository;
-	private final EntityValidator entityValidator;
+	private final GroupRepository groupRepository;
 
 	@Override
-	public StudentDto getStudent(Long id) {
-		Student student = entityValidator.validateStudentExist(id);
-
-		Set<String> studentGroups = student.getGroups().stream()
-					.map(Group::getGroupName)
-					.collect(Collectors.toSet());
-
-		StudentDto studentDto = studentMapper.toDto(student);
-		studentDto.groups().addAll(studentGroups);
-
+	@Transactional(readOnly = true)
+	public StudentDtoResponse getStudent(Long id) {
+		Student student = studentRepository.findByIdOrThrow(id);
 		log.info("Student with id = {} has been found", id);
-		return studentDto;
+		return studentMapper.toFullDto(student);
 	}
 
 	@Override
 	@Transactional
-	public void addStudent(StudentDto studentDto) {
+	public StudentDtoResponse addStudent(StudentDto studentDto) {
 		Student student = studentMapper.toEntity(studentDto);
 
 		Set<Group> studentGroups = convertNamesToGroups(studentDto);
 		student.setGroups(studentGroups);
-
 		studentRepository.save(student);
+
 		log.info("Student has been added");
+		return studentMapper.toFullDto(student);
 	}
 
 	@Override
 	@Transactional
-	public void updateStudent(Long id, StudentDto studentDto) {
-		entityValidator.validateStudentExist(id);
-
+	public StudentDtoResponse updateStudent(Long id, StudentDto studentDto) {
 		Set<Group> studentGroups = convertNamesToGroups(studentDto);
-		Student student = studentMapper.toEntity(studentDto);
-		student.setId(id);
-		student.setGroups(studentGroups);
 
-		studentRepository.save(student);
+		Student student = studentRepository.findByIdOrThrow(id);
+		student.setName(studentDto.name());
+		student.setSurname(studentDto.surname());
+		student.setGroups(studentGroups);
 		log.info("Student has been updated");
+
+		return studentMapper.toFullDto(student);
 	}
 
 	@Override
-	public void deleteStudent(Long id) {
-		Student student = entityValidator.validateStudentExist(id);
-
-		studentRepository.delete(student);
+	@Transactional
+	public StudentDtoResponse deleteStudent(Long id) {
+		Student student = studentRepository.findByIdOrThrow(id);
+		student.setDeleted(true);
 		log.info("Student has been deleted");
+		return studentMapper.toFullDto(student);
 	}
 
 	private @NonNull Set<Group> convertNamesToGroups(StudentDto studentDto) {
 		return studentDto.groups().stream()
-					.map(entityValidator::validateGroupNameExist)
+					.map(groupRepository::findByGroupNameOrThrow)
 					.collect(Collectors.toSet());
 	}
 }

@@ -29,28 +29,28 @@ public class GroupController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> addGroup(@Valid @RequestBody GroupDtoGroupName groupDtoGroupName) {
-		groupService.addGroup(groupDtoGroupName);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<GroupDtoResponse> addGroup(@Valid @RequestBody GroupDtoGroupName groupDtoGroupName) {
+		GroupDtoResponse dto = groupService.addGroup(groupDtoGroupName);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> updateGroup(@PathVariable(name = "id") Long id,
+	public ResponseEntity<GroupDtoResponse> updateGroup(@PathVariable(name = "id") Long id,
 	                                        @Valid @RequestBody GroupDtoGroupName groupDtoGroupName) {
-		groupService.updateGroup(id, groupDtoGroupName);
-		return ResponseEntity.status(HttpStatus.OK).build();
+		GroupDtoResponse dto = groupService.updateGroup(id, groupDtoGroupName);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteGroup(@PathVariable(name = "id") Long id) {
-		groupService.deleteGroup(id);
-		return ResponseEntity.status(HttpStatus.OK).build();
+	public ResponseEntity<GroupDtoResponse> deleteGroup(@PathVariable(name = "id") Long id) {
+		GroupDtoResponse dto = groupService.deleteGroup(id);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
 	@PostMapping("/{group_id}")
-	public ResponseEntity<Void> addStudentToGroup(@PathVariable(name = "group_id") Long id,
+	public ResponseEntity<GroupDtoResponse> addStudentToGroup(@PathVariable(name = "group_id") Long id,
 	                                              @RequestBody GroupDtoSetStudents groupDtoSetStudents) {
-		groupService.addStudentToGroup(id, groupDtoSetStudents);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		GroupDtoResponse dto = groupService.addStudentToGroup(id, groupDtoSetStudents);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 }

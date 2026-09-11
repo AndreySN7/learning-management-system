@@ -12,18 +12,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "groups")
+@SQLRestriction(value = "deleted = false")
 public class Group {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,9 @@ public class Group {
 	@NotBlank
 	@Column(name = "group_name")
 	private String groupName;
+
+	@Column(columnDefinition = "boolean default false")
+	private boolean deleted;
 
 	@ManyToMany(mappedBy = "groups")
 	private Set<Student> students = new HashSet<>();

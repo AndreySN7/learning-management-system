@@ -1,13 +1,14 @@
 package com.learning.learning_management_system.service;
 
-import com.learning.learning_management_system.dto.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDtoResponse;
 
 public interface CourseService {
-	CourseDto getCourse(Long id);
+	CourseDtoResponse getCourse(Long id);
 
-	void addCourse(CourseDto courseDto);
+	CourseDtoResponse addCourse(CourseDto courseDto);
 
-	void updateCourse(Long id, CourseDto courseDto);
+	CourseDtoResponse updateCourse(Long id, CourseDto courseDto);
 
-	void deleteCourse(Long id);
+	CourseDtoResponse deleteCourse(Long id);
 }

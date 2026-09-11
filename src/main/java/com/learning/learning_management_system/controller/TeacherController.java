@@ -1,6 +1,7 @@
 package com.learning.learning_management_system.controller;
 
-import com.learning.learning_management_system.dto.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDtoResponse;
 import com.learning.learning_management_system.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,26 +23,27 @@ public class TeacherController {
 	private final TeacherService teacherService;
 
 	@GetMapping(path = "/{id}")
-	public TeacherDto getTeacher(@PathVariable(name = "id") Long id) {
-		return teacherService.getTeacher(id);
+	public ResponseEntity<TeacherDtoResponse> getTeacher(@PathVariable(name = "id") Long id) {
+		TeacherDtoResponse dto = teacherService.getTeacher(id);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
 	@PostMapping()
-	public ResponseEntity<Void> addTeacher(@Valid @RequestBody TeacherDto teacherDto) {
-		teacherService.addTeacher(teacherDto);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<TeacherDtoResponse> addTeacher(@Valid @RequestBody TeacherDto teacherDto) {
+		TeacherDtoResponse dto = teacherService.addTeacher(teacherDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 
 	@PutMapping(path = "/{id}")
-	public ResponseEntity<Void> updateTeacher(@PathVariable(name = "id") Long id,
+	public ResponseEntity<TeacherDtoResponse> updateTeacher(@PathVariable(name = "id") Long id,
 	                                          @Valid @RequestBody TeacherDto teacherDto) {
-		teacherService.updateTeacher(id, teacherDto);
-		return ResponseEntity.ok().build();
+		TeacherDtoResponse dto = teacherService.updateTeacher(id, teacherDto);
+		return ResponseEntity.ok().body(dto);
 	}
 
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Void> deleteTeacher(@PathVariable(name = "id") Long id) {
-		teacherService.deleteTeacher(id);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<TeacherDtoResponse> deleteTeacher(@PathVariable(name = "id") Long id) {
+		TeacherDtoResponse dto = teacherService.deleteTeacher(id);
+		return ResponseEntity.ok().body(dto);
 	}
 }

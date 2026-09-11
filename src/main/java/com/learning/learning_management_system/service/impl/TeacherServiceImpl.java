@@ -1,11 +1,11 @@
 package com.learning.learning_management_system.service.impl;
 
-import com.learning.learning_management_system.dto.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDtoResponse;
 import com.learning.learning_management_system.entity.Teacher;
 import com.learning.learning_management_system.mapper.TeacherMapper;
 import com.learning.learning_management_system.repository.TeacherRepository;
 import com.learning.learning_management_system.service.TeacherService;
-import com.learning.learning_management_system.validation.EntityValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,39 +17,39 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeacherServiceImpl implements TeacherService {
 	private final TeacherRepository teacherRepository;
 	private final TeacherMapper teacherMapper;
-	private final EntityValidator entityValidator;
 
 	@Override
-	public TeacherDto getTeacher(Long id) {
-		Teacher teacher = entityValidator.validateTeacherExist(id);
-
+	public TeacherDtoResponse getTeacher(Long id) {
+		Teacher teacher = teacherRepository.findByIdOrThrow(id);
 		log.info("Teacher with id = {} has been found: {}", id, teacher);
 		return teacherMapper.toDto(teacher);
 	}
 
 	@Override
-	public void addTeacher(TeacherDto teacherDto) {
+	public TeacherDtoResponse addTeacher(TeacherDto teacherDto) {
 		Teacher teacher = teacherMapper.toEntity(teacherDto);
 		teacherRepository.save(teacher);
 		log.info("Teacher has been added");
+		return teacherMapper.toDto(teacher);
 	}
 
 	@Override
 	@Transactional
-	public void updateTeacher(Long id, TeacherDto teacherDto) {
-		entityValidator.validateTeacherExist(id);
-
-		Teacher currentTeacher = new Teacher(id, teacherDto.name(), teacherDto.surname());
-		teacherRepository.save(currentTeacher);
+	public TeacherDtoResponse updateTeacher(Long id, TeacherDto teacherDto) {
+		Teacher currentTeacher = teacherRepository.findByIdOrThrow(id);
+		currentTeacher.setName(teacherDto.name());
+		currentTeacher.setSurname(teacherDto.surname());
 		log.info("Teacher has been updated");
+		return teacherMapper.toDto(currentTeacher);
 	}
 
 	@Override
 	@Transactional
-	public void deleteTeacher(Long id) {
-		Teacher teacher = entityValidator.validateTeacherExist(id);
+	public TeacherDtoResponse deleteTeacher(Long id) {
+		Teacher teacher = teacherRepository.findByIdOrThrow(id);
 
-		teacherRepository.delete(teacher);
+		teacher.setDeleted(true);
 		log.info("Teacher has been deleted");
+		return teacherMapper.toDto(teacher);
 	}
 }

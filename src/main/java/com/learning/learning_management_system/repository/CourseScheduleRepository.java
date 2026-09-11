@@ -1,6 +1,7 @@
 package com.learning.learning_management_system.repository;
 
 import com.learning.learning_management_system.entity.Schedule;
+import com.learning.learning_management_system.exception.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,4 +19,9 @@ public interface CourseScheduleRepository extends JpaRepository<Schedule, Long> 
 	Page<Schedule> findAllByTeacherId(Long teacherId, Pageable pageable);
 
 	List<Schedule> findAllByEndDateBefore(LocalDate localDate);
+
+	default Schedule findByIdOrThrow(Long scheduleId) {
+		return findById(scheduleId)
+					.orElseThrow(() -> new EntityNotFoundException("CourseSchedule not found"));
+	}
 }

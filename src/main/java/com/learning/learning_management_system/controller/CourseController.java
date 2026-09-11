@@ -1,6 +1,7 @@
 package com.learning.learning_management_system.controller;
 
-import com.learning.learning_management_system.dto.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDto;
+import com.learning.learning_management_system.dto.course.CourseDtoResponse;
 import com.learning.learning_management_system.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,26 +23,27 @@ public class CourseController {
 	private final CourseService courseService;
 
 	@GetMapping("/{id}")
-	public CourseDto getCourse(@PathVariable(name = "id") Long id) {
-		return courseService.getCourse(id);
+	public ResponseEntity<CourseDtoResponse> getCourse(@PathVariable(name = "id") Long id) {
+		CourseDtoResponse dto = courseService.getCourse(id);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> addCourse(@Valid @RequestBody CourseDto courseDto) {
-		courseService.addCourse(courseDto);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<CourseDtoResponse> addCourse(@Valid @RequestBody CourseDto courseDto) {
+		CourseDtoResponse dto = courseService.addCourse(courseDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> updateCourse(@PathVariable(name = "id") Long id,
-	                                         @Valid @RequestBody CourseDto courseDto) {
-		courseService.updateCourse(id, courseDto);
-		return ResponseEntity.status(HttpStatus.OK).build();
+	public ResponseEntity<CourseDtoResponse> updateCourse(@PathVariable(name = "id") Long id,
+	                                                      @Valid @RequestBody CourseDto courseDto) {
+		CourseDtoResponse dto = courseService.updateCourse(id, courseDto);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteCourse(@PathVariable(name = "id") Long id) {
-		courseService.deleteCourse(id);
-		return ResponseEntity.status((HttpStatus.OK)).build();
+	public ResponseEntity<CourseDtoResponse> deleteCourse(@PathVariable(name = "id") Long id) {
+		CourseDtoResponse dto = courseService.deleteCourse(id);
+		return ResponseEntity.status(HttpStatus.OK).body(dto);
 	}
 }

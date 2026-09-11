@@ -1,10 +1,10 @@
-package com.learning.learning_management_system.dto;
+package com.learning.learning_management_system.dto.teacher;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CourseDto(
+public record TeacherDto(
 			@NotBlank(message = "Value can not be empty")
 			String name,
-			String description
+			String surname
 ) {
 }

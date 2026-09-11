@@ -24,4 +24,4 @@ logging:
 
 app:
   cleanup:
-    cron: "0 */2 * * * *"
+    cron: "0 0 0 * * *"

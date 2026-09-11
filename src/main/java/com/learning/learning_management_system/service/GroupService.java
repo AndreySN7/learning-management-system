@@ -8,11 +8,11 @@ public interface GroupService {
 
 	GroupDtoResponse getGroup(Long id);
 
-	void addGroup(GroupDtoGroupName groupDtoGroupName);
+	GroupDtoResponse addGroup(GroupDtoGroupName groupDtoGroupName);
 
-	void updateGroup(Long id, GroupDtoGroupName groupDtoGroupName);
+	GroupDtoResponse updateGroup(Long id, GroupDtoGroupName groupDtoGroupName);
 
-	void deleteGroup(Long id);
+	GroupDtoResponse deleteGroup(Long id);
 
-	void addStudentToGroup(Long groupId, GroupDtoSetStudents students);
+	GroupDtoResponse addStudentToGroup(Long groupId, GroupDtoSetStudents students);
 }

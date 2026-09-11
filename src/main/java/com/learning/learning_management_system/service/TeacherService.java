@@ -1,13 +1,14 @@
 package com.learning.learning_management_system.service;
 
-import com.learning.learning_management_system.dto.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDto;
+import com.learning.learning_management_system.dto.teacher.TeacherDtoResponse;
 
 public interface TeacherService {
-	TeacherDto getTeacher(Long id);
+	TeacherDtoResponse getTeacher(Long id);
 
-	void addTeacher(TeacherDto teacherDto);
+	TeacherDtoResponse addTeacher(TeacherDto teacherDto);
 
-	void updateTeacher(Long id, TeacherDto teacherDto);
+	TeacherDtoResponse updateTeacher(Long id, TeacherDto teacherDto);
 
-	void deleteTeacher(Long id);
+	TeacherDtoResponse deleteTeacher(Long id);
 }
