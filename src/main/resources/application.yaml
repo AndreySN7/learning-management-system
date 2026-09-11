@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: learning-management-system
+  config:
+    import: optional:db-credentials.yml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/learning-management-system
+    username: ${DB_USERNAME:username}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    org.springframework.web: debug
+
+app:
+  cleanup:
+    cron: "0 0 0 * * *"
