@@ -22,7 +22,7 @@ public class CourseServiceImpl implements CourseService {
 	public CourseDtoResponse getCourse(Long id) {
 		Course course = courseRepository.findByIdOrThrow(id);
 
-		log.info("Course with id = {} has been found: {} ", id, course);
+		log.info("Course with id = {} has been found: {} {}", id, course.getName(), course.getDescription());
 		return courseMapper.toDto(course);
 	}
 

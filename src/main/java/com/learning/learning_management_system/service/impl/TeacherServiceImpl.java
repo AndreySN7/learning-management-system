@@ -21,7 +21,7 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public TeacherDtoResponse getTeacher(Long id) {
 		Teacher teacher = teacherRepository.findByIdOrThrow(id);
-		log.info("Teacher with id = {} has been found: {}", id, teacher);
+		log.info("Teacher with id = {} has been found: {} {}", id, teacher.getName(), teacher.getSurname());
 		return teacherMapper.toDto(teacher);
 	}
 
