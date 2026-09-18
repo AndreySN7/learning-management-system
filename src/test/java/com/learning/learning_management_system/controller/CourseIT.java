@@ -28,7 +28,7 @@ class CourseIT extends AbstractIntegrationTest {
 	@Autowired
 	private CourseRepository courseRepository;
 	@Autowired
-	ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
 	private Course course;
 
