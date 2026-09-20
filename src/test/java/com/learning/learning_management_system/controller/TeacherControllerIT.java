@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TeacherIT extends AbstractIntegrationTest {
+class TeacherControllerIT extends AbstractIntegrationTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@Autowired

@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CourseIT extends AbstractIntegrationTest {
+class CourseControllerIT extends AbstractIntegrationTest {
 	@Autowired
 	private MockMvc mockMvc;
 	@Autowired
