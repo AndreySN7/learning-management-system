@@ -49,7 +49,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 											.teacherId(dto.teacherId())
 											.courseId(course.getId())
 											.build())
-								.collect(Collectors.toSet());
+					.collect(Collectors.toSet());
 
 		courseScheduleRepository.saveAll(courseSchedule);
 		log.info("Course schedule has been added");
@@ -59,8 +59,11 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 	@Transactional
 	public void updateCourseTimeForGroup(Long id, CourseScheduleDtoCourseTime dto) {
 		Schedule courseSchedule = courseScheduleRepository.findByIdOrThrow(id);
-		if (dto.endDate().isBefore(dto.startDate())) {
+		if (dto.startDate() != null && dto.endDate() != null && dto.endDate().isBefore(dto.startDate())) {
 			throw new DataValidateException("The end date cannot be less than the start date");
+		}
+		if (dto.startDate() == null && dto.endDate() != null) {
+			throw new DataValidateException("The start date cannot be empty if the end date exists");
 		}
 		courseSchedule.setStartDate(dto.startDate());
 		courseSchedule.setEndDate(dto.endDate());
