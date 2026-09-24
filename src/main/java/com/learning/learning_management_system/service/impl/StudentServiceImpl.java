@@ -29,7 +29,7 @@ public class StudentServiceImpl implements StudentService {
 	@Transactional(readOnly = true)
 	public StudentDtoResponse getStudent(Long id) {
 		Student student = studentRepository.findByIdOrThrow(id);
-		log.info("Student with id = {} has been found", id);
+		log.info("Student with id = {} has been found: {} {}", id, student.getName(),  student.getSurname());
 		return studentMapper.toFullDto(student);
 	}
 

@@ -2,6 +2,7 @@ package com.learning.learning_management_system.repository;
 
 import com.learning.learning_management_system.entity.Group;
 import com.learning.learning_management_system.exception.EntityNotFoundException;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,14 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 				nativeQuery = true)
 	void addStudentToGroup(@Param("group_id") Long groupId, @Param("student_id") Long studentId);
 
+	@EntityGraph(attributePaths = "students")
+	@Query(value = "select g from Group g where g.id =  :id")
+	Optional<Group> findByIdWithStudents(@Param("id") Long id);
+
+	@Query(value = "select deleted from groups where id = :id", nativeQuery = true)
+	Boolean isDeletedById(@Param(value = "id") Long id);
+
+	@Modifying
 	default Group findByIdOrThrow(Long groupId) {
 		return findById(groupId)
 					.orElseThrow(() -> new EntityNotFoundException("Group not found"));
